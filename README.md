@@ -45,5 +45,5 @@ This project focuses on implementing Customer Lifetime Value (CLV) segmentation 
 ## CONCLUSION 
 Smart segmentation is a game-changer in the telecom industry, offering a strategic pathway to unlock customer lifetime value and drive growth. By leveraging data analytics and personalized strategies, telecom companies can not only retain their customers but also maximize their revenue potential.
 
-## THANK YOU
+## THANK YOU :smile:
 
