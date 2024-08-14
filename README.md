@@ -38,8 +38,12 @@ This project focuses on implementing Customer Lifetime Value (CLV) segmentation 
 ![](crossandupselling.PNG)
 
 ## KEY INSIGHTS AND LEARNINGS
-Enhanced Customer Understanding: Deepened understanding of customer needs and behaviors, enabling more effective targeting.
-Increased Revenue: Significant uplift in ARPU through targeted upselling and cross-selling efforts.
-Improved Retention: Reduction in churn rates by proactively addressing the needs of at-risk segments.
+- Enhanced Customer Understanding: Deepened understanding of customer needs and behaviors, enabling more effective targeting.
+- Increased Revenue: Significant uplift in ARPU through targeted upselling and cross-selling efforts.
+- Improved Retention: Reduction in churn rates by proactively addressing the needs of at-risk segments.
 
-CONCLUSION Smart segmentation is a game-changer in the telecom industry, offering a strategic pathway to unlock customer lifetime value and drive growth. By leveraging data analytics and personalized strategies, telecom companies can not only retain their customers but also maximize their revenue potential.
+## CONCLUSION 
+Smart segmentation is a game-changer in the telecom industry, offering a strategic pathway to unlock customer lifetime value and drive growth. By leveraging data analytics and personalized strategies, telecom companies can not only retain their customers but also maximize their revenue potential.
+
+## THANK YOU
+
