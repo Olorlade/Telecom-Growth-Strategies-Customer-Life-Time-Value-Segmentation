@@ -1,0 +1,334 @@
+PostGreSQL Query
+
+--CREATE A TABLE--
+CREATE TABLE "NexaSat".nexa_sat(
+           Customer_ID VARCHAR(30),
+           Gender VARCHAR(10),
+           Partner VARCHAR(5),
+           Dependents VARCHAR(5),
+           Senior_Citizen INT,
+           Call_Duration FLOAT,
+           Data_Usage FLOAT,
+           Plan_Type VARCHAR(30),
+           Plan_Level VARCHAR(30),
+           Monthly_Bill_Amount FLOAT,
+           Tenure_Months INT,
+           Multiple_Lines VARCHAR(5),
+           Tech_Support VARCHAR(5),
+           Churn INT);
+
+-- Confirm Current Schema --
+SELECT current_schema();
+
+--Set Path to schema NexaSat--
+SET search_path TO "NexaSat";
+
+--View data--
+SELECT * FROM nexa_sat;
+
+
+--DATA CLEANING--
+--Finding Duplicates--
+SELECT Customer_ID,Gender,Partner,Dependents,Senior_Citizen,
+       Call_Duration,Data_Usage,Plan_Type,Plan_Level,
+	   Monthly_Bill_Amount,Tenure_Months,
+	   Multiple_Lines,Tech_Support,Churn
+FROM nexa_sat
+GROUP BY Customer_ID,Gender,Partner,Dependents,Senior_Citizen,
+       Call_Duration,Data_Usage,Plan_Type,Plan_Level,
+	   Monthly_Bill_Amount,Tenure_Months,
+	   Multiple_Lines,Tech_Support,Churn
+HAVING COUNT(*)>1; --this filters out the rows with duplicates--
+--output, no duplicates found--
+
+--Finding null values--
+SELECT *
+FROM nexa_sat
+WHERE Customer_ID IS NULL
+OR Gender IS NULL
+OR Partner IS NULL
+OR Dependents IS NULL
+OR Senior_Citizen IS NULL
+OR Call_Duration IS NULL
+OR Data_Usage IS NULL
+OR Plan_Type IS NULL
+OR Plan_Level IS NULL
+OR Monthly_Bill_Amount IS NULL
+OR Tenure_Months IS NULL
+OR Multiple_Lines IS NULL
+OR Tech_Support IS NULL
+OR Churn IS NULL; --there are no null values--
+
+--EXPLORATORY DATA ANALYSIS--
+--How many customers are still with NexaSat--
+SELECT COUNT(Customer_ID) AS current_customers
+FROM nexa_sat
+WHERE Churn = 0; --there are 4272 active customers--
+
+--How many customers have churned--
+SELECT COUNT(Customer_ID) AS churned_customers
+FROM nexa_sat
+WHERE Churn = 1; --there are 2771 churned customers--
+
+--How many customers have partners and dependents--
+SELECT COUNT(*) AS customer_partners_dependents
+FROM nexa_sat
+WHERE Partner = 'Yes' AND Dependents ='Yes'; --1749 customers have both partners and dependents--
+
+--How many customers use Tech Support--
+SELECT COUNT (Customer_ID) as tech_support
+FROM nexa_sat
+WHERE Tech_Support = 'Yes';
+
+--Total revenue of customers--
+SELECT SUM(monthly_bill_amount) AS revenue
+FROM nexa_sat;
+
+--Revenue by Plan level--
+SELECT Plan_level, ROUND(SUM(monthly_bill_amount::numeric),2) AS revenue
+FROM nexa_sat
+GROUP BY Plan_level;
+
+--Average Tenure by plan level--
+SELECT Plan_level, ROUND(AVG(monthly_bill_amount::numeric),2) AS avg_tenure
+FROM nexa_sat
+GROUP BY Plan_level
+ORDER BY Plan_level;
+
+--CUSTOMER LIFE-TIME VALUE SEGMENTATION--
+
+--Firstly, create a table of existing_customers--
+CREATE TABLE existing_customers AS
+SELECT *
+FROM nexa_sat
+WHERE Churn = 0;
+
+--To view new table 'existing_customers'--
+SELECT * FROM existing_customers;
+
+--Calculate the ARPU for exiting customers--
+SELECT ROUND(AVG(monthly_bill_amount::INT),0) AS ARPU
+FROM existing_customers;
+
+--Calculate the CLV of each existing customers--
+--firstly create a new column clv--
+ALTER TABLE existing_customers
+ADD COLUMN clv FLOAT;
+
+--update the new column with values--
+UPDATE existing_customers
+SET clv = monthly_bill_amount*tenure_months;
+
+--view new clv column--
+SELECT customer_id, clv
+FROM existing_customers;
+
+
+--CUSTOMER LIFE-TIME VALUE SCORE-- 
+--firstly, create a new column clv score--
+ALTER TABLE existing_customers
+ADD COLUMN clv_score NUMERIC(10,2);
+
+--update the new column clv score with values--
+UPDATE existing_customers
+SET clv_score = (0.4 * monthly_bill_amount)+
+                (0.3 * tenure_months)+
+		(0.1 * call_duration)+
+		(0.1 * data_usage)+
+		(0.1 * CASE WHEN plan_level = 'Premium'
+		THEN 1 ELSE 0
+                END);  
+
+--view the clv score column--
+SELECT customer_id,clv_score
+FROM existing_customers;
+				 
+				 
+--Grouping existing customers into segments based on their clv score--
+--firstly,create a new column clv segment--
+ALTER TABLE existing_customers
+ADD COLUMN clv_segment VARCHAR;
+				 
+--update the new column clv segment with values--
+UPDATE existing_customers
+SET clv_segment = CASE WHEN clv_score > (SELECT percentile_cont(0.85)
+					WITHIN GROUP(ORDER BY clv_score)
+					FROM existing_customers)THEN 'High Value'
+		       WHEN clv_score >= (SELECT percentile_cont(0.50)
+					WITHIN GROUP(ORDER BY clv_score)
+					FROM existing_customers)THEN 'Moderate value'
+		       WHEN clv_score >= (SELECT percentile_cont(0.25)
+					WITHIN GROUP(ORDER BY clv_score)
+					FROM existing_customers)THEN 'Low value'						
+                       ELSE 'Churn Risk' 
+		       END;
+
+--view the clv_segment column--
+SELECT customer_id,clv,clv_score,clv_segment
+FROM existing_customers;
+				
+
+-- SEGMENT ANALYSIS--
+--Average monthly bill and tenure per segment--
+SELECT clv_segment,
+       ROUND(AVG(monthly_bill_amount::INT),0) AS avg_monthly_bill,
+	   ROUND(AVG(tenure_months::INT),0) AS avg_tenure_months
+FROM existing_customers
+GROUP BY 1;
+
+--Revenue per segment--
+SELECT clv_segment,
+       COUNT(customer_id),
+	   CAST(SUM(monthly_bill_amount*tenure_months) AS NUMERIC(10,2)) AS total_revenue
+FROM existing_customers
+GROUP BY clv_segment; -- or use GROUP BY 1--
+
+
+--Segment with tech support and no dependents--
+SELECT clv_segment, COUNT(customer_id)
+FROM existing_customers
+WHERE Tech_support = 'Yes'
+AND Dependents = 'No'
+GROUP BY 1;
+
+--CROSS SELLING AND UP SELLING--
+--CROSS SELLING: tech support to senior citizens with no dependents in the low value and churn risk segment--
+SELECT customer_id
+FROM existing_customers
+WHERE senior_citizen = 1
+AND dependents = 'No'
+AND tech_support = 'No'
+AND (clv_segment = 'Low value' OR clv_segment = 'Churn Risk');
+--outcome-- there are 115 customers to cross sell--
+
+--CROSS SELL:Female Senior Citizen w/o Partners,Dependents and Tech Support--
+SELECT customer_id
+FROM existing_customers
+WHERE gender = 'Female'
+AND senior_citizen = 1
+AND dependents = 'No'
+AND tech_support = 'No'
+AND partner = 'No';
+--outcome-- there are 46 female customers to cross sell--
+
+--UP SELLING:Premium discount for basic customers with churn risk--
+SELECT customer_id
+FROM existing_customers
+WHERE clv_segment = 'Churn Risk'
+AND plan_level = 'Basic';
+--outcome-- there are 753 customers--
+
+--UP SELLING:Female non senior citizen with dependent under the moderate value segment--
+SELECT customer_id
+FROM existing_customers
+WHERE gender = 'Female'
+AND senior_citizen = 0
+AND dependents = 'Yes'
+AND clv_segment = 'Moderate value';
+
+
+--STORED PROCEDURES--
+---Tech support to senior citizens with no dependents in the low value and churn risk segment---
+CREATE FUNCTION tech_support_snr_citizens()
+RETURNS TABLE (customer_id VARCHAR(50))
+AS $$
+BEGIN
+     RETURN QUERY
+	 SELECT ec.customer_id
+     FROM existing_customers ec
+     WHERE ec.senior_citizen = 1
+     AND ec.dependents = 'No'
+     AND ec.tech_support = 'No'
+     AND (ec.clv_segment = 'Low value' OR ec.clv_segment = 'Churn Risk');
+END;
+$$ LANGUAGE plpgsql;
+	 
+--Female Senior Citizen w/o Partners,Dependents and Tech Support--	 
+CREATE FUNCTION female_snr_citizens()
+RETURNS TABLE (customer_id VARCHAR(50))
+AS $$
+BEGIN
+     RETURN QUERY
+     SELECT ec.customer_id
+     FROM existing_customers ec
+     WHERE ec.gender = 'Female'
+     AND ec.senior_citizen = 1
+     AND ec.dependents = 'No'
+     AND ec.tech_support = 'No'
+     AND ec.partner = 'No';
+END;
+$$ LANGUAGE plpgsql;
+
+
+--Premium discount for basic customers with churn risk--
+CREATE FUNCTION churn_risk_premium_discount()
+RETURNS TABLE (customer_id VARCHAR(50))
+AS $$
+BEGIN
+     RETURN QUERY
+     SELECT ec.customer_id
+     FROM existing_customers ec
+     WHERE ec.clv_segment = 'Churn Risk'
+     AND ec.plan_level = 'Basic';
+END;
+$$ LANGUAGE plpgsql;
+
+--Female non senior citizen with dependent under the moderate value segment--
+CREATE FUNCTION Female_non_snr_citizen()
+RETURNS TABLE (customer_id VARCHAR(50))
+AS $$
+BEGIN
+     RETURN QUERY
+     SELECT ec.customer_id
+	 FROM existing_customers ec
+	 WHERE ec.gender = 'Female'
+	 AND ec.senior_citizen = 0
+	 AND ec.dependents = 'Yes'
+	 AND ec.clv_segment = 'Moderate value';
+END;
+$$ LANGUAGE plpgsql;
+
+
+--USE PROCEDURES--
+--tech_support_snr_citizens--
+SELECT * FROM tech_support_snr_citizens(); --115
+
+--Female Senior Citizen w/o Partners,Dependents and Tech Support--	 
+SELECT * FROM female_snr_citizens();  --46
+
+--Premium discount for basic customers with churn risk--
+SELECT * FROM churn_risk_premium_discount(); --753
+
+--Female non senior citizen with dependent under the moderate value segment--
+SELECT * FROM Female_non_snr_citizen(); --205
+
+
+
+
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
