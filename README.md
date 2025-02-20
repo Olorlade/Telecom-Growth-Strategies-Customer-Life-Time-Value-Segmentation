@@ -1,8 +1,7 @@
 # Telecom-Growth-Strategies-Customer-Life-Time-Value-Segmentation
 ## INTRODUCTION NexaSat 
-A leading telecommunications company specializing in mobile internet and television services, faces challenges in optimizing marketing strategies and allocating resources. In the competitive world of telecommunications, understanding and optimizing Customer Lifetime Value (CLV) is crucial for sustained growth and profitability. One effective strategy to achieve this is through smart segmentation. In this post, I’ll share my experience working on the project focused on unlocking customer lifetime value through smart segmentation, and how it can drive telecom growth strategies.
-Check file TELECOM_GROWTH_STRATEGIES.pdf
-
+A leading telecommunications company specializing in mobile internet and television services, faces challenges in optimizing marketing strategies and allocating resources. In the competitive world of telecommunications, understanding and optimizing Customer Lifetime Value (CLV) is crucial for sustained growth and profitability. One effective strategy to achieve this is through smart segmentation. In this post, I’ll share my experience working on the project focused on unlocking customer lifetime value through smart segmentation, and how it can drive telecom growth strategies. [Check file](TELECOM_GROWTH_STRATEGIES.pdf)
+ 
 ## PROJECT OVERVIEW 
 This project focuses on implementing Customer Lifetime Value (CLV) segmentation at NexaSat in other to;
 - Highlighting opportunities for up-selling and cross-selling
@@ -11,14 +10,21 @@ This project focuses on implementing Customer Lifetime Value (CLV) segmentation 
 - Maximize revenue
 - Strengthen customer loyalty in a competitive telecom landscape
 ## APPROACH AND INSIGHTS
-1- Data Description: Summarized characteristics of the dataset. Check file DATA_DESCRIPTION.pdf
+1- Data Description: Summarized characteristics of the dataset. [Data Description](DATA_DESCRIPTION.pdf)
 
-2- Data Importation: Imported data from a CSV file into PostgreSQL. Check file NexaSatData.csv
+2- Data Importation: Imported data from a CSV file into PostgreSQL. [NexaSat Dataset](NexaSatData.csv)
+- Created database and table
+  
 ![](NexaSat_table.PNG)
 
 3- Data Cleaning: Ensured the data is accurate and reliable by checking for duplicates and null values.
+- Checking for duplicates
 ![](No_duplicates.PNG)
-![](No_null.PNG)
+
+
+- Checking for null values
+
+   ![](No_null.PNG)
 
 4- Exploratory Data Analysis: Performed an in-depth analysis of the customer dataset, encompassing demographic details and usage trends, yielding valuable insights into customer behavior and preferences.
 ![](EDA_nexasat.PNG)
