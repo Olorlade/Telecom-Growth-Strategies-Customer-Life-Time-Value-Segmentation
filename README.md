@@ -41,8 +41,8 @@ This project focuses on implementing Customer Lifetime Value (CLV) segmentation 
 
 8- Cross-Selling and Up-Selling: Employed techniques to maximize sales revenue and improve customer satisfaction by providing more comprehensive solutions or experiences.
 
-![](cross_and_upselling.PNG)
-![](crossandupselling.PNG)
+![](Cross_Selling.PNG)
+![](Up_Selling.PNG)
 
 ## KEY INSIGHTS AND LEARNINGS
 - Enhanced Customer Understanding: Deepened understanding of customer needs and behaviors, enabling more effective targeting.
