@@ -1,21 +1,21 @@
 PostGreSQL Query
 
 --CREATE A TABLE--
-CREATE TABLE "NexaSat".nexa_sat(
-           Customer_ID VARCHAR(30),
-           Gender VARCHAR(10),
-           Partner VARCHAR(5),
-           Dependents VARCHAR(5),
-           Senior_Citizen INT,
-           Call_Duration FLOAT,
-           Data_Usage FLOAT,
-           Plan_Type VARCHAR(30),
-           Plan_Level VARCHAR(30),
-           Monthly_Bill_Amount FLOAT,
-           Tenure_Months INT,
-           Multiple_Lines VARCHAR(5),
-           Tech_Support VARCHAR(5),
-           Churn INT);
+CREATE TABLE "Nexa_Sat".nexa_sat (
+    Customer_ID VARCHAR(50),
+    gender VARCHAR(10),
+    Partner VARCHAR(3),
+    Dependents VARCHAR(3),
+    Senior_Citizen INT,
+    Call_Duration FLOAT,
+    Data_Usage FLOAT,
+    Plan_Type VARCHAR(20),
+    Plan_Level VARCHAR(20),
+    Monthly_Bill_Amount FLOAT,
+    Tenure_Months INT,
+    Multiple_Lines VARCHAR(3),
+    Tech_Support VARCHAR(3),
+    Churn INT);
 
 -- Confirm Current Schema --
 SELECT current_schema();
