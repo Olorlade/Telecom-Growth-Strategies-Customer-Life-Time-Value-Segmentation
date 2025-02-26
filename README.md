@@ -1,5 +1,5 @@
 # Telecom Growth Strategies: Unlocking Customer Life Time Value Through Smart Segmentation
-## 🏢BUSINESS OVERVIEW 
+## 🏢BUSINESS OVERVIEW
 NexaSat is a leading telecommunications company specializing in mobile internet and television services. It serves diverse customers, ranging from individuals to small and medium-sized businesses. However, NexaSat faces challenges in optimizing marketing strategies and allocating resources efficiently. 
 ## PROBLEM STATEMENT
 Key challenges include:
