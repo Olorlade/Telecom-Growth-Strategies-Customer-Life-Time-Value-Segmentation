@@ -47,6 +47,8 @@ Analyzed customer behavior, service usage trends, and churn rates to derive insi
 Developed relevant features such as CLV and CLV Scores, which serve as key inputs for the CLV segmentation model.
 Created CLV and CLV Scores as key segmentation features.
 
+![](existing_customers.PNG)
+
 ![](clv_score.PNG)
 
 ### SEGMENTATION: 
